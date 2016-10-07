@@ -15,7 +15,8 @@ local function parsedLines(file, fields)
       return
     end
 
-    local values = stringx.split(line, " -:-~-:- ")
+    -- local values = stringx.split(line, " -:-~-:- ")
+    local values = stringx.split( line, " +++$+++ ")
     local t = {}
 
     for i,field in ipairs(fields) do
@@ -37,7 +38,7 @@ local function progress(c)
 	end
 end
 
-local DATASET_FIELDS = {"conv_id","character","text"}
+local DATASET_FIELDS = {"conv_id", "character_id", "movie_id", "character","text"}
 
 function IrcDialogs:load()
 	local lines = {}
@@ -48,7 +49,7 @@ function IrcDialogs:load()
 
 	print("Parsing IRC conversation...")
 
-	for conv in parsedLines(self.dir .. "/conversation.log", DATASET_FIELDS) do
+	for conv in parsedLines(self.dir .. "/cornell_movie_dialogs/movie_lines.txt", DATASET_FIELDS) do
 		if prevConvID ~= conv.conv_id then
 			if #conversation > 0 then
 				table.insert(conversations, conversation)
