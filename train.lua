@@ -27,7 +27,8 @@ end
 
 -- Data
 print("-- Loading dataset")
-dataset = neuralconvo.DataSet(neuralconvo.CornellMovieDialogs("data/cornell_movie_dialogs"),
+
+dataset = neuralconvo.DataSet(neuralconvo.IrcDialogs("data"),
                     {
                       loadFirst = options.dataset,
                       maxVocabSize = options.maxVocabSize
