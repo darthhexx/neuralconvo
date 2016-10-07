@@ -72,17 +72,17 @@ for epoch = 1, options.maxEpoch do
   collectgarbage()
 
   local nextBatch = dataset:batches(options.batchSize)
-  local params, gradParams = model:getParameters()      
-    
+  local params, gradParams = model:getParameters()
+
   -- Define optimizer
   local function feval(x)
     if x ~= params then
       params:copy(x)
     end
-    
+
     gradParams:zero()
     local encoderInputs, decoderInputs, decoderTargets = nextBatch()
-    
+
     if options.cuda then
       encoderInputs = encoderInputs:cuda()
       decoderInputs = decoderInputs:cuda()
@@ -98,7 +98,7 @@ for epoch = 1, options.maxEpoch do
     model:forwardConnect(encoderInputs:size(1))
     local decoderOutput = model.decoder:forward(decoderInputs)
     local loss = model.criterion:forward(decoderOutput, decoderTargets)
-    
+
     local avgSeqLen = nil
     if #decoderInputs:size() == 1 then
       avgSeqLen = decoderInputs:size(1)
@@ -106,20 +106,20 @@ for epoch = 1, options.maxEpoch do
       avgSeqLen = torch.sum(torch.sign(decoderInputs)) / decoderInputs:size(2)
     end
     loss = loss / avgSeqLen
-    
+
     -- Backward pass
     local dloss_doutput = model.criterion:backward(decoderOutput, decoderTargets)
     model.decoder:backward(decoderInputs, dloss_doutput)
     model:backwardConnect()
     model.encoder:backward(encoderInputs, encoderOutput:zero())
-    
+
     gradParams:clamp(-options.gradientClipping, options.gradientClipping)
-    
+
     return loss,gradParams
   end
 
   -- run epoch
-  
+
   print("\n-- Epoch " .. epoch .. " / " .. options.maxEpoch ..
     "  (LR= " .. optimState.learningRate .. ")")
   print("")
@@ -131,7 +131,7 @@ for epoch = 1, options.maxEpoch do
     collectgarbage()
     local _,tloss = optim.adam(feval, params, optimState)
     err = tloss[1] -- optim returns a list
-  
+
     model.decoder:forget()
     model.encoder:forget()
 
@@ -141,7 +141,7 @@ for epoch = 1, options.maxEpoch do
 
   xlua.progress(dataset.examplesCount, dataset.examplesCount)
   timer:stop()
-  
+
   errors = torch.Tensor(errors)
   print("\n\nFinished in " .. xlua.formatTime(timer:time().real) ..
     " " .. (dataset.examplesCount / timer:time().real) .. ' examples/sec.')
