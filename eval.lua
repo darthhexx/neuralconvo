@@ -54,7 +54,7 @@ function say(text)
   local input = torch.Tensor(list.reverse(wordIds))
   local wordIds, probabilities = model:eval(input)
 
-  print("neuralconvo> " .. pred2sent(wordIds))
+  print("ai> " .. pred2sent(wordIds))
 
   if options.debug then
     printProbabilityTable(wordIds, probabilities, 4)
@@ -64,7 +64,7 @@ end
 print("\nType a sentence and hit enter to submit.")
 print("CTRL+C then enter to quit.\n")
 while true do
-  io.write("you> ")
+  io.write(">> ")
   io.flush()
   io.write(say(io.read()))
 end
